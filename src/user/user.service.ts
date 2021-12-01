@@ -64,9 +64,7 @@ export class UserService {
         console.log('ok')
         await this.setUserAsVerified(user);
         return {
-            fullName: user.fullName,
-            email: user.email,
-            accessToken: await this.authService.createAccessToken(user._id),
+            accessToken: await this.authService.createAccessToken(user),
             refreshToken: await this.authService.createRefreshToken(req, user._id),
         };
     }
@@ -116,12 +114,7 @@ export class UserService {
         await this.checkPassword(loginUserDto.password, user);
         await this.passwordsAreMatch(user);
         return {
-            fullName: user.fullName,
-            loc: user.loc,
-            imgURL: user.imgURL,
-            name: user.name,
-            email: user.email,
-            accessToken: await this.authService.createAccessToken(user._id),
+            accessToken: await this.authService.createAccessToken(user),
             refreshToken: await this.authService.createRefreshToken(req, user._id),
             role: user.roles
         };
@@ -135,7 +128,7 @@ export class UserService {
             throw new BadRequestException('Bad request');
         }
         return {
-            accessToken: await this.authService.createAccessToken(user._id),
+            accessToken: await this.authService.createAccessToken(user)
         };
     }
 
@@ -216,7 +209,7 @@ export class UserService {
         await user.save();
     }
 
-    private async findUserByEmail(email: string): Promise<User> {
+    public async findUserByEmail(email: string): Promise<User> {
         const user = await this.userModel.findOne({email, verified: true});
         if (!user) {
           throw new NotFoundException('Wrong email or password.');

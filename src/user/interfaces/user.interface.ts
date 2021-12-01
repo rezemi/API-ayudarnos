@@ -3,7 +3,6 @@ import { Document } from 'mongoose';
 export interface User extends Document {
     
     readonly name: string;
-    readonly loc?: string;
     readonly fullName?: string;
     readonly email: string;
     readonly imgURL: string;
@@ -16,6 +15,7 @@ export interface User extends Document {
     //if user is fundation
     readonly webURL?: string;
     readonly provincia?: string;
+    readonly loc?: string;
     readonly adress?: string;
     readonly tel?: [number];
 

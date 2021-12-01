@@ -24,10 +24,18 @@ export class AuthService {
     this.cryptr = new Cryptr(process.env.ENCRYPT_JWT_SECRET);
   }
 
-  async createAccessToken(userId: string) {
+  async createAccessToken(user: User) {
     // const accessToken = this.jwtService.sign({userId});
-    const accessToken = sign({userId}, process.env.JWT_SECRET , { expiresIn: process.env.JWT_EXPIRATION });
-    return this.encryptText(accessToken);
+    const payload: JwtPayload = { userId: user._id,
+                                  email: user.email,
+                                  name: user.name,
+                                  fullName: user.fullName,
+                                  imgURL: user.imgURL,
+                                  donaciones: user.donaciones,
+                                  premios: user.premios }
+    const accessToken = sign(payload, process.env.JWT_SECRET , { expiresIn: process.env.JWT_EXPIRATION });
+    //return this.encryptText(accessToken);
+    return {accessToken};
   }
 
   async createRefreshToken(req: Request, userId) {
@@ -58,9 +66,7 @@ export class AuthService {
     return user;
   }
 
-  //   ┬┬ ┬┌┬┐  ┌─┐─┐ ┬┌┬┐┬─┐┌─┐┌─┐┌┬┐┌─┐┬─┐
-  //   ││││ │   ├┤ ┌┴┬┘ │ ├┬┘├─┤│   │ │ │├┬┘
-  //  └┘└┴┘ ┴   └─┘┴ └─ ┴ ┴└─┴ ┴└─┘ ┴ └─┘┴└─
+ //JWT extractor
   private jwtExtractor(request) {
     let token = null;
     if (request.header('x-token')) {
@@ -84,11 +90,7 @@ export class AuthService {
     return token;
 }
 
-  // ***********************
-  // ╔╦╗╔═╗╔╦╗╦ ╦╔═╗╔╦╗╔═╗
-  // ║║║║╣  ║ ╠═╣║ ║ ║║╚═╗
-  // ╩ ╩╚═╝ ╩ ╩ ╩╚═╝═╩╝╚═╝
-  // ***********************
+  //metodos
   returnJwtExtractor() {
     return this.jwtExtractor;
   }
