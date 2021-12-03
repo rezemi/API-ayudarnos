@@ -115,8 +115,7 @@ export class UserService {
         await this.passwordsAreMatch(user);
         return {
             accessToken: await this.authService.createAccessToken(user),
-            refreshToken: await this.authService.createRefreshToken(req, user._id),
-            role: user.roles
+            refreshToken: await this.authService.createRefreshToken(req, user._id)
         };
     }
 
