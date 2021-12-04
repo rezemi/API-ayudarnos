@@ -17,7 +17,7 @@ export const UserSchema = new mongoose.Schema ({
     imgURL: {
       type: String,
       required: [false, 'NAME_IS_BLANK'],
-      default: 'https://res.cloudinary.com/dg0jfxuoc/image/upload/v1635880591/hand2_ye43nt.png'
+      default: 'https://res.cloudinary.com/dg0jfxuoc/image/upload/v1638571962/profile-default_iej5xe.png'
     },
     premios: {
       type: Number,
