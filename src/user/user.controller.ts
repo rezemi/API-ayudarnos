@@ -84,6 +84,16 @@ export class UserController {
         return await this.userService.login(req, loginUserDto);
     }
 
+    @Post('LogInProvider')
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({description: 'User has been successfully logged in and tokens generated.'})
+    @ApiNotFoundResponse({description: 'User not found wrong email or password.'})
+    @ApiConflictResponse({description: 'User blocked try later.'})
+    @ApiBadRequestResponse({description: 'Data validation failed or Bad request.'})
+    async loginProvider(@Req() req: Request, @Body() user: CreateUserDto) {
+        return await this.userService.loginWithProvider(req, user.email);
+    }
+
     @Post('refresh-access-token')
     @HttpCode(HttpStatus.CREATED)
     @ApiCreatedResponse({description: 'Access token has been generated successfully.'})
