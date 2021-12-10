@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PaginateModel, PaginateResult } from 'mongoose';
 import { caseDto } from './dto/case.dto';
 import { Case } from './interface/case.interface';
+
 
 @Injectable()
 export class CaseService {
 
     constructor(
         @InjectModel('Case') private readonly caseModel: Model<Case>,
+        @InjectModel('Case') private readonly caseModelPagination: PaginateModel<Case>,
     ){}
+
+    async getCasesWithPagination(limit: number, page: number): Promise<PaginateResult<Case>> {
+        const cases = await this.caseModelPagination.paginate({}, { limit, page });
+        return cases
+    }
 
     //Post a single case
     async createCase(caseDTO: caseDto): Promise<Case> {

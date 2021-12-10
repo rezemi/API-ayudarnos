@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export const CaseSchema = new mongoose.Schema({
     title: {

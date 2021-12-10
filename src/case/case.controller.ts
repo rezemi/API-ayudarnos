@@ -23,6 +23,12 @@ export class caseController {
         return res.status(HttpStatus.OK).json(cases);
     }
 
+    @Get('/casePagination')
+    async getCasesPagination(@Res() res, @Query('limit') limit, @Query('page') page){
+        const cases = await this.caseService.getCasesWithPagination(limit, page)
+        return res.status(HttpStatus.OK).json(cases);
+    }
+
     // Add case: /case/create
     @Post('/create')
     async createCase(@Res() res, @Body() caseDTO: caseDto) {

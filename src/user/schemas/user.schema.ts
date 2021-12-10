@@ -7,7 +7,7 @@ export const UserSchema = new mongoose.Schema ({
         type: String,
         minLength: 6,
       maxLength: 255,
-      required: [true, 'NAME_IS_BLANK'],
+      required: [false, 'NAME_IS_BLANK'],
     },
     donaciones: {
       type: Number,
@@ -63,7 +63,7 @@ export const UserSchema = new mongoose.Schema ({
         type: String,
         minlength: 5,
         maxlength: 1024,
-        required: [true, 'PASSWORD_IS_BLANK'],
+        required: [false, 'PASSWORD_IS_BLANK'],
     },
     bankAccountNumber: {
         type: String,

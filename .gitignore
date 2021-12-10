@@ -1,6 +1,6 @@
 #environment
 .env
-
+/src/config.ts
 # compiled output
 /dist
 /node_modules

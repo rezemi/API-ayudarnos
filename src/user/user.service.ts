@@ -70,7 +70,7 @@ export class UserService {
     }
 
     async sendEmailVerification(parm: string): Promise<boolean> {   
-        var model = await this.userModel.findOne({email: parm, verified: false});
+        var model = await this.userModel.findOne({ email: parm });
         if(model != null){
             
             var transporter = nodemailer.createTransport({
@@ -113,6 +113,17 @@ export class UserService {
         this.isUserBlocked(user);
         await this.checkPassword(loginUserDto.password, user);
         await this.passwordsAreMatch(user);
+        return {
+            accessToken: await this.authService.createAccessToken(user),
+            refreshToken: await this.authService.createRefreshToken(req, user._id)
+        };
+    }
+
+    //Login
+    async loginWithProvider(req: Request, email: string) {
+        const user = await this.findUserByEmail(email);
+        console.log(user);
+        this.isUserBlocked(user);
         return {
             accessToken: await this.authService.createAccessToken(user),
             refreshToken: await this.authService.createRefreshToken(req, user._id)
