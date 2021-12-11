@@ -6,6 +6,7 @@ import { EmailVerificationSchema } from './schemas/emailverification.schema';
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { MailerService } from 'src/mailer/mailer.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { UserService } from './user.service';
     AuthModule,
   ],
   controllers: [UserController],
-  providers: [UserService]
+  providers: [UserService, MailerService]
 })
 export class UserModule {}

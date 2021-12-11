@@ -15,9 +15,11 @@ import { RefreshAccessTokenDto } from './dto/refresh-access-token.dto';
 import { ForgotPassword } from './interfaces/forgot-password.interface';
 import { User } from './interfaces/user.interface';
 import * as nodemailer from 'nodemailer';
-import {default as config} from '../config';
+import { default as config } from '../config';
 import { EmailVerification } from './interfaces/emailverification.interface';
 import { userUpdateDto } from './dto/userUpdate.dto';
+import { MailOptions } from '../mailer/interface/mailOptions';
+import { MailerService } from 'src/mailer/mailer.service';
 
 @Injectable()
 export class UserService {
@@ -31,10 +33,11 @@ export class UserService {
         @InjectModel('User') private readonly userModel: Model<User>,
         @InjectModel('ForgotPassword') private readonly forgotPasswordModel: Model<ForgotPassword>,
         private readonly authService: AuthService,
-        ) {}
+        private readonly mailerService: MailerService,
+    ) { }
 
     findAll(): any {
-        return {hello: 'world'};
+        return { hello: 'world' };
     }
 
     //crear user
@@ -48,7 +51,7 @@ export class UserService {
 
     //actualizar
     async upDateUser(userEmail: string, userUpdate: userUpdateDto): Promise<User> {
-        const user = await this.userModel.findOneAndUpdate({email: userEmail}, userUpdate, { new: true});
+        const user = await this.userModel.findOneAndUpdate({ email: userEmail }, userUpdate, { new: true });
         return user;
     }
 
@@ -69,46 +72,33 @@ export class UserService {
         };
     }
 
-    async sendEmailVerification(parm: string): Promise<boolean> {   
+    async sendEmailVerification(parm: string): Promise<boolean> {
         var model = await this.userModel.findOne({ email: parm });
-        if(model != null){
-            
-            var transporter = nodemailer.createTransport({
-                host: config.mail.host,
-                port: config.mail.port,
-                secure: config.mail.secure,     // true for 465, false for other ports
-                requireTLS: true,
-                secureConnection: false,         
-                auth: {
-                    user: config.mail.user,
-                    pass: config.mail.pass
-                }
-            });
+        if (model != null) {
 
             const sendHtml = `Hola! <br><br> Gracias por registrarse,
             para verificar su cuenta haga click en el enlace y luego inicie sesión<br><br>
             <a href=https://api-nestjs-crediciim.herokuapp.com/user/api-verify-email/${model.verification}> Haga click aquí para activar su cuenta</a>
-            <li></li>` 
+            <li></li>`
             //link href=http://localhost:8100/verify-email --> FRONTEND
 
-            var mailOptions = {
-              from: '"Ayudarnos" <' + config.mail.user + '>', 
-              to: model.email, // list of receivers (separated by ,)
-              subject: 'Verificar Email', 
-              text: 'Verify Email', 
-              html: sendHtml
+            var mailOptions = <MailOptions>{
+                to: model.email, // list of receivers (separated by ,)
+                subject: 'Verificar Email',
+                text: 'Verify Email',
+                html: sendHtml
             };
 
-            var sent = transporter.sendMail(mailOptions);
-        return sent
+            var sent = this.mailerService.createTransport(mailOptions);
+            return sent
         } else {
-          //throw new HttpException('REGISTER.USER_NOT_REGISTERED', HttpStatus.FORBIDDEN);
-          return sent
+            //throw new HttpException('REGISTER.USER_NOT_REGISTERED', HttpStatus.FORBIDDEN);
+            return sent
         }
-      }
+    }
 
-      //Login
-      async login(req: Request, loginUserDto: LoginUserDto) {
+    //Login
+    async login(req: Request, loginUserDto: LoginUserDto) {
         const user = await this.findUserByEmail(loginUserDto.email);
         this.isUserBlocked(user);
         await this.checkPassword(loginUserDto.password, user);
@@ -128,6 +118,20 @@ export class UserService {
             accessToken: await this.authService.createAccessToken(user),
             refreshToken: await this.authService.createRefreshToken(req, user._id)
         };
+    }
+
+    //send maila new user login with provider
+    public async sendMailToNewUser(mail: string) {
+        const sendHtml = `Hola! <br><br> Gracias por registrarse en "Ayudarnos!"!`
+
+        var mailOptions = <MailOptions>{
+            to: mail, // list of receivers (separated by ,)
+            subject: 'Email registrado',
+            text: 'Verify Email',
+            html: sendHtml
+        };
+        var sent = this.mailerService.createTransport(mailOptions);
+        return sent;
     }
 
     //Refresh Token
@@ -174,7 +178,7 @@ export class UserService {
 
     //METODOS PRIVADOS
     private async isEmailUnique(email: string) {
-        const user = await this.userModel.findOne({email, verified: true});
+        const user = await this.userModel.findOne({ email, verified: true });
         if (user) {
             throw new BadRequestException('Email most be unique.');
         }
@@ -199,7 +203,7 @@ export class UserService {
     }
 
     private async findByVerification(verification: string): Promise<User> {
-        const user = await this.userModel.findOne({verification, verified: false, verificationExpires: {$gt: new Date()}});
+        const user = await this.userModel.findOne({ verification, verified: false, verificationExpires: { $gt: new Date() } });
         if (!user) {
             throw new BadRequestException('Bad request.');
         }
@@ -207,7 +211,7 @@ export class UserService {
     }
 
     private async findByEmail(email: string): Promise<User> {
-        const user = await this.userModel.findOne({email, verified: true});
+        const user = await this.userModel.findOne({ email, verified: true });
         if (!user) {
             throw new NotFoundException('Email not found.');
         }
@@ -220,12 +224,12 @@ export class UserService {
     }
 
     public async findUserByEmail(email: string): Promise<User> {
-        const user = await this.userModel.findOne({email, verified: true});
+        const user = await this.userModel.findOne({ email, verified: true });
         if (!user) {
-          throw new NotFoundException('Wrong email or password.');
+            throw new NotFoundException('Wrong email or password.');
         }
         return user;
-      }
+    }
 
     private async checkPassword(attemptPass: string, user) {
         const match = await bcrypt.compare(attemptPass, user.password);
@@ -234,7 +238,7 @@ export class UserService {
             throw new NotFoundException('Wrong email or password.');
         }
         return match;
-      }
+    }
 
     private isUserBlocked(user) {
         if (user.blockExpires > Date.now()) {
@@ -257,7 +261,7 @@ export class UserService {
     }
 
     private async passwordsAreMatch(user) {
-        user.loginAttempts = 0 ;
+        user.loginAttempts = 0;
         await user.save();
     }
 
@@ -278,7 +282,7 @@ export class UserService {
             verification: verifyUuidDto.verification,
             firstUsed: false,
             finalUsed: false,
-            expires: {$gt: new Date()},
+            expires: { $gt: new Date() },
         });
         if (!forgotPassword) {
             throw new BadRequestException('Bad request.');
@@ -299,7 +303,7 @@ export class UserService {
             email: resetPasswordDto.email,
             firstUsed: true,
             finalUsed: false,
-            expires: {$gt: new Date()},
+            expires: { $gt: new Date() },
         });
         if (!forgotPassword) {
             throw new BadRequestException('Bad request.');

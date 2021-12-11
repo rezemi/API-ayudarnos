@@ -39,10 +39,14 @@ export class UserController {
     @ApiBadRequestResponse({description: 'email address most be unique.'})
     @ApiBadRequestResponse({description: 'Data validation failed or Bad request..'})
     async register(@Body() createUserDto: CreateUserDto) {
-        console.log(createUserDto)
+        let sent
         try {
-        await this.userService.create(createUserDto);  
-        var sent = await this.userService.sendEmailVerification(createUserDto.email);
+        const user = await this.userService.create(createUserDto);
+        if (user.verified) {
+            sent = await this.userService.sendMailToNewUser(user.email)
+        }else{
+            sent = await this.userService.sendEmailVerification(createUserDto.email);
+        } 
       if(sent){
         return new ResponseSuccess("REGISTRATION.USER_REGISTERED_SUCCESSFULLY");
       } else {
