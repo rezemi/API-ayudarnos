@@ -14,8 +14,6 @@ import { VerifyUuidDto } from './dto/verify-uuid.dto';
 import { RefreshAccessTokenDto } from './dto/refresh-access-token.dto';
 import { ForgotPassword } from './interfaces/forgot-password.interface';
 import { User } from './interfaces/user.interface';
-import * as nodemailer from 'nodemailer';
-import { default as config } from '../config';
 import { EmailVerification } from './interfaces/emailverification.interface';
 import { userUpdateDto } from './dto/userUpdate.dto';
 import { MailOptions } from '../mailer/interface/mailOptions';

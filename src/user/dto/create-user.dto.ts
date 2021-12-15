@@ -84,4 +84,6 @@ export class CreateUserDto {
       description:'telefonos de la fundacion',
     })
     readonly tel?: [number];
+
+    readonly loc?: string;
   }

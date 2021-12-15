@@ -38,7 +38,7 @@ export class CaseService {
 
     //Get all actives cases
     async getAllactiveCases(): Promise<Case[]> {
-        const cases = await this.caseModel.find({ finished: false });
+        const cases = await this.caseModel.find({ finished: false }).limit(5);
         return cases;
     }
 
@@ -56,7 +56,7 @@ export class CaseService {
 
     //Delete a single case
     async deleteCase(id: String): Promise<any> {
-        const aCase = await this.caseModel.findOneAndDelete(id);
+        const aCase = await this.caseModel.findOneAndDelete({ _id: id });
         return aCase;
     }
 }

@@ -8,6 +8,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryProvider } from './cloudinary/cloudinary';
 import { CasenModule } from './case/case.module';
 import { MailerService } from './mailer/mailer.service';
+import { FundationModule } from './fundation/fundation.module';
 require('dotenv').config();
 
 @Module({
@@ -19,7 +20,8 @@ require('dotenv').config();
     AuthModule,
     UserModule,
     CloudinaryModule,
-    CasenModule],
+    CasenModule,
+    FundationModule],
   controllers: [AppController],
   providers: [AppService, CloudinaryProvider, MailerService],
 })
