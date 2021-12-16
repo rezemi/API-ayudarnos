@@ -39,7 +39,12 @@ export class FundationService {
 
     //retornar una
     async getFundation(id: String): Promise<Fundation> {
-        const fundation = await this.fundationModel.findById( { _id: id } );
+        const fundation = await this.fundationModel.findById(id);
         return fundation;
+    }
+
+    async getAllFundations(): Promise<Fundation[]> {
+        const fundations = await this.fundationModel.find().limit(5);
+        return fundations;
     }
 }

@@ -31,6 +31,12 @@ export class FundationController {
         return res.status(HttpStatus.OK).json(fundations);
     }
 
+    @Get('/allFundation')
+    async getFundations(@Res() res){
+        const fundations = await this.fundationService.getAllFundations()
+        return res.status(HttpStatus.OK).json(fundations);
+    }
+
     @Get('/:fundationID')
     async getAsingleCase(@Res() res, @Param('fundationID') fundationID) {
         const fundation = await this.fundationService.getFundation(fundationID);
